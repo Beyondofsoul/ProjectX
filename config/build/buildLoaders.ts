@@ -23,34 +23,30 @@ export function buildLoaders(options: BuildOptions): ModuleOptions['rules'] {
     type: 'asset/resource',
   };
 
-  const scssModulesLoader = {
-    test: /\.module\.s[ac]ss$/i,
+  const cssLoaderWithModules = {
+    loader: 'css-loader',
+    options: {
+      modules: {
+        auto: true,
+        localIdentName: isDev ? '[path][name]__[local]' : '[hash:base64:8]',
+      },
+    },
+  };
+
+  const scssLoader = {
+    test: /\.s[ac]ss$/i,
+
     use: [
       isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
-      {
-        loader: 'css-loader',
-        options: {
-          modules: {
-            localIdentName: isDev ? '[path][name]__[local]' : '[hash:base64:8]',
-          },
-        },
-      },
+      cssLoaderWithModules,
       'sass-loader',
     ],
   };
-
-  // ✅ Обычные SCSS (глобальные стили)
-  const scssLoader = {
-    test: /\.s[ac]ss$/i,
-    exclude: /\.module\.s[ac]ss$/i,
-    use: [isDev ? 'style-loader' : MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
-  };
-
   const tsLoader = {
     test: /\.tsx?$/,
     use: 'ts-loader',
     exclude: /node_modules/,
   };
 
-  return [assetLoader, svgrLoader, tsLoader, scssModulesLoader, scssLoader];
+  return [assetLoader, svgrLoader, scssLoader, tsLoader];
 }
